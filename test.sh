@@ -23,9 +23,7 @@ if [ -z "$OUTPUT" ]; then
 fi
 
 if [ "$MODE" = "base" ]; then
-  # Run an existing test to prove the baseline works
-  pytest tests/test_app.py --junitxml="$OUTPUT"
+  pytest tests/test_geometry.py --junitxml="$OUTPUT"
 else
-  # Run our new regression test
   pytest tests/test_hexdump.py --junitxml="$OUTPUT"
 fi
