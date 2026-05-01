@@ -7,17 +7,7 @@ from textual.reactive import reactive
 from textual.widget import Widget
 
 class HexDump(Widget, can_focus=True):
-    """A widget to display binary data in a hex dump format."""
-
-    DEFAULT_CSS = """
-    HexDump {
-        height: auto;
-        width: auto;
-        background: $surface;
-        color: $text;
-        padding: 1 2;
-    }
-    """
+    DEFAULT_CSS = "HexDump { height: auto; width: auto; background: $surface; color: $text; padding: 1 2; }"
 
     data: reactive[bytes] = reactive(b"")
     show_offset: reactive[bool] = reactive(True)
@@ -54,53 +44,43 @@ class HexDump(Widget, can_focus=True):
             chunk = self.data[i : i + self.bytes_per_line]
             line_text = Text()
 
-            # 1. Offset: 8-digit cyan hex + exactly two spaces
+            # 1. Offset: 8-digit uppercase hex + 2 spaces
             if self.show_offset:
-                line_text.append(f"{i:08X}  ", style="cyan")
+                line_text.append(f"{i:08X}  ")
 
-            # 2. Hex Data: Two-digit green strings + single space
+            # 2. Hex Section: 2-digit uppercase + single space
             for byte_offset, b in enumerate(chunk):
                 global_index = i + byte_offset
-                hex_str = f"{b:02X}"
-                style = "reverse red" if global_index == self.highlight_index else "green"
-                line_text.append(hex_str, style=style)
-                
-                # Single space between hex pairs, but not after the last byte of the chunk
+                style = "reverse red" if global_index == self.highlight_index else ""
+                line_text.append(f"{b:02X}", style=style)
                 if byte_offset < len(chunk) - 1:
                     line_text.append(" ")
 
-            # 3. Padding and ASCII Section
+            # 3. ASCII Section
             if self.show_ascii:
-                # Pad the hex section if the line is incomplete to keep ASCII aligned
-                missing_bytes = self.bytes_per_line - len(chunk)
-                if missing_bytes > 0:
-                    # 3 spaces per missing byte (2 for hex digits + 1 for separator)
-                    line_text.append("   " * missing_bytes)
+                # Pad hex section for short lines
+                missing = self.bytes_per_line - len(chunk)
+                if missing > 0:
+                    line_text.append("   " * missing)
                 
-                # Exactly two spaces before the pipe
-                line_text.append("  |", style="dim")
+                # 2 spaces before the pipe
+                line_text.append("  |")
                 for byte_offset, b in enumerate(chunk):
                     global_index = i + byte_offset
-                    # Printable characters (32-126), others are dots
                     char = chr(b) if 32 <= b <= 126 else "."
-                    style = "reverse red" if global_index == self.highlight_index else "yellow"
+                    style = "reverse red" if global_index == self.highlight_index else ""
                     line_text.append(char, style=style)
-                line_text.append("|", style="dim")
+                line_text.append("|")
 
             lines.append(line_text)
 
         return Text("\n").join(lines)
 
     def get_content_width(self, container: Size, viewport: Size) -> int:
-        width = 0
-        if self.show_offset:
-            width += 10 # 8 digits + 2 spaces
-        
-        # Hex portion width
+        width = 10 if self.show_offset else 0
         width += (self.bytes_per_line * 3) - 1
-        
         if self.show_ascii:
-            width += 4 + self.bytes_per_line # 2 spaces + 2 pipes + chars
+            width += 4 + self.bytes_per_line
         return width
 
     def get_content_height(self, container: Size, viewport: Size, width: int) -> int:
