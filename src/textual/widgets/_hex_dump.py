@@ -1,5 +1,4 @@
 from __future__ import annotations
-
 import math
 from rich.text import Text
 from textual.geometry import Size
@@ -7,8 +6,6 @@ from textual.reactive import reactive
 from textual.widget import Widget
 
 class HexDump(Widget, can_focus=True):
-    """A widget to display binary data in a hex dump format."""
-
     DEFAULT_CSS = """
     HexDump {
         height: auto;
@@ -60,10 +57,8 @@ class HexDump(Widget, can_focus=True):
             for byte_offset, b in enumerate(chunk):
                 global_index = i + byte_offset
                 hex_str = f"{b:02X}"
-                
                 style = "reverse red" if global_index == self.highlight_index else "green"
                 line_text.append(hex_str, style=style)
-                    
                 if byte_offset < len(chunk) - 1:
                     line_text.append(" ")
 
@@ -76,7 +71,6 @@ class HexDump(Widget, can_focus=True):
                 for byte_offset, b in enumerate(chunk):
                     global_index = i + byte_offset
                     char = chr(b) if 32 <= b <= 126 else "."
-                    
                     style = "reverse red" if global_index == self.highlight_index else "yellow"
                     line_text.append(char, style=style)
                 line_text.append("|", style="dim")
