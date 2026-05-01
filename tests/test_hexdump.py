@@ -3,11 +3,10 @@ from textual.app import App
 from textual.widgets import HexDump
 from textual.geometry import Size
 
-@pytest.mark.asyncio  # <--- THIS IS THE MAGIC FIX
+@pytest.mark.asyncio
 async def test_hexdump_comprehensive_behavior():
     class HexDumpApp(App):
         def compose(self):
-            # 20 bytes of data to test multiple lines with bytes_per_line=16
             yield HexDump(b"A" * 20, highlight_index=17)
 
     app = HexDumpApp()
@@ -50,7 +49,7 @@ async def test_hexdump_comprehensive_behavior():
         
         assert "00000000  " not in toggled_plain
         assert "|AAAA|" not in toggled_plain
-        assert "41 41 41" in toggled_plain  # hex should still be there
+        assert "41 41 41" in toggled_plain
         
         # Dimension width should shrink after toggling
         shrunk_width = widget.get_content_width(Size(80, 24), Size(80, 24))
