@@ -62,11 +62,11 @@ class HexDump(Widget, can_focus=True):
                 if byte_offset < len(chunk) - 1:
                     line_text.append(" ")
 
-            missing_bytes = self.bytes_per_line - len(chunk)
-            if missing_bytes > 0:
-                line_text.append("   " * missing_bytes)
-
             if self.show_ascii:
+                missing_bytes = self.bytes_per_line - len(chunk)
+                if missing_bytes > 0:
+                    line_text.append("   " * missing_bytes)
+                
                 line_text.append("  |", style="dim")
                 for byte_offset, b in enumerate(chunk):
                     global_index = i + byte_offset
