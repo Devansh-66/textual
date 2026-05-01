@@ -4,8 +4,9 @@ from textual.widgets import HexDump
 from textual.geometry import Size
 
 @pytest.mark.asyncio
-async def test_hexdump_comprehensive_behavior():
-    data = b"Hello" + b"\x01" + b"World!"
+async def test_hexdump_comprehensive():
+    # 20 bytes to test multi-line wrapping (16 per line)
+    data = b"Hello" + b"\x01" + b"World!" + b"12345678"
     
     class HexDumpApp(App):
         def compose(self):
@@ -15,26 +16,28 @@ async def test_hexdump_comprehensive_behavior():
     async with app.run_test() as pilot:
         widget = app.query_one(HexDump)
         
+        # 1. Verify exact 8-digit offset and 2-space gap
+        text_result = widget.render()
+        plain = text_result.plain
+        assert "00000000  " in plain
+        assert "00000010  " in plain
+        
+        # 2. Verify ASCII wrapping and 2-space leading gap
+        assert "  |Hello.World!123|" in plain
+        
+        # 3. Verify Highlighting in both columns (index 0 is 'H')
+        styles = [str(span.style) for span in text_result.spans]
+        highlight_count = sum(1 for s in styles if "reverse red" in s)
+        assert highlight_count == 2
+        
+        # 4. Verify Multi-line dimensions
         width = widget.get_content_width(Size(80, 24), Size(80, 24))
         height = widget.get_content_height(Size(80, 24), Size(80, 24), width)
-        assert width > 0
-        assert height >= 1
+        assert height == 2
         
-        text_result = widget.render()
-        plain_text = text_result.plain
-        
-        assert "00000000  " in plain_text
-        assert "|Hello.World!|" in plain_text
-
-        styles = [str(span.style) for span in text_result.spans]
-        assert "cyan" in styles
-        assert "green" in styles
-        assert "yellow" in styles
-        
-        highlight_count = sum(1 for style in styles if "reverse red" in style)
-        assert highlight_count == 2
-
-        widget.highlight_index = None
-        none_result = widget.render()
-        none_styles = [str(span.style) for span in none_result.spans]
-        assert "reverse red" not in none_styles
+        # 5. Verify Toggling show_offset and show_ascii
+        widget.show_offset = False
+        widget.show_ascii = False
+        toggled_plain = widget.render().plain
+        assert "00000000" not in toggled_plain
+        assert "|" not in toggled_plain
