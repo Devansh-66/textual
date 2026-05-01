@@ -20,6 +20,7 @@ if typing.TYPE_CHECKING:
     from textual.widgets._footer import Footer
     from textual.widgets._header import Header
     from textual.widgets._help_panel import HelpPanel
+    from textual.widgets._hexdump import HexDump
     from textual.widgets._input import Input
     from textual.widgets._key_panel import KeyPanel
     from textual.widgets._label import Label
@@ -61,6 +62,7 @@ __all__ = [
     "Footer",
     "Header",
     "HelpPanel",
+    "HexDump",
     "Input",
     "KeyPanel",
     "Label",
