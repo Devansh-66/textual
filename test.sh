@@ -25,7 +25,7 @@ if [ -z "$OUTPUT" ]; then
 fi
 
 if [ "$MODE" = "base" ]; then
-  pytest tests -k "not hexdump" --junitxml="$OUTPUT"
+  pytest tests -k "not test_hexdump" --junitxml="$OUTPUT"
 else
   pytest tests/test_hexdump.py --junitxml="$OUTPUT"
 fi
