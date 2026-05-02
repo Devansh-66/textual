@@ -8,7 +8,10 @@ from textual.widget import Widget
 
 
 class HexDump(Widget, can_focus=True):
-    DEFAULT_CSS = "HexDump { height: auto; width: auto; background: $surface; color: $text; padding: 1 2; }"
+    DEFAULT_CSS = (
+        "HexDump { height: auto; width: auto; "
+        "background: $surface; color: $text; padding: 1 2; }"
+    )
 
     data: reactive[bytes] = reactive(b"")
     show_offset: reactive[bool] = reactive(True)
@@ -50,20 +53,24 @@ class HexDump(Widget, can_focus=True):
             if self.show_offset:
                 line.append(f"{i:08X}  ")
 
-            # HEX SECTION (fixed width)
+            # HEX SECTION
             hex_parts = []
             for byte_offset, b in enumerate(chunk):
                 global_index = i + byte_offset
-                style = "reverse red" if global_index == self.highlight_index else None
+                style = (
+                    "reverse red"
+                    if global_index == self.highlight_index
+                    else None
+                )
                 hex_parts.append((f"{b:02X}", style))
 
-            # build hex string with correct spacing
+            # build hex string (FIXED spacing logic)
             for idx, (hx, style) in enumerate(hex_parts):
                 line.append(hx, style=style)
-                if idx < self.bytes_per_line - 1:
+                if idx < len(chunk) - 1:  # ✅ FIX
                     line.append(" ")
 
-            # pad missing bytes (VERY IMPORTANT for alignment)
+            # pad for alignment (important)
             missing = self.bytes_per_line - len(chunk)
             if missing > 0:
                 line.append("   " * missing)
@@ -74,13 +81,17 @@ class HexDump(Widget, can_focus=True):
                 for byte_offset, b in enumerate(chunk):
                     global_index = i + byte_offset
                     char = chr(b) if 32 <= b <= 126 else "."
-                    style = "reverse red" if global_index == self.highlight_index else None
+                    style = (
+                        "reverse red"
+                        if global_index == self.highlight_index
+                        else None
+                    )
                     line.append(char, style=style)
                 line.append("|")
 
             lines.append(line)
 
-        # SAFE JOIN (NO Text.join)
+        # SAFE JOIN
         result = Text()
         for idx, line in enumerate(lines):
             if idx:
@@ -95,7 +106,7 @@ class HexDump(Widget, can_focus=True):
         if self.show_offset:
             width += 10  # 8 hex + 2 spaces
 
-        # hex section width (fixed)
+        # hex section (fixed width)
         width += (self.bytes_per_line * 3) - 1
 
         if self.show_ascii:
@@ -103,7 +114,9 @@ class HexDump(Widget, can_focus=True):
 
         return width
 
-    def get_content_height(self, container: Size, viewport: Size, width: int) -> int:
+    def get_content_height(
+        self, container: Size, viewport: Size, width: int
+    ) -> int:
         if not self.data:
             return 1
         return math.ceil(len(self.data) / self.bytes_per_line)
