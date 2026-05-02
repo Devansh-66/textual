@@ -24,4 +24,8 @@ if [ -z "$OUTPUT" ]; then
   OUTPUT="results.xml"
 fi
 
-pytest tests --junitxml="$OUTPUT"
+if [ "$MODE" = "base" ]; then
+  pytest tests -k "not hexdump" --junitxml="$OUTPUT"
+else
+  pytest tests/test_hexdump.py --junitxml="$OUTPUT"
+fi
