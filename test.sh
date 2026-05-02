@@ -1,7 +1,9 @@
 #!/bin/bash
 set -e
+
 OUTPUT=""
 MODE=""
+
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --output_path)
@@ -22,8 +24,4 @@ if [ -z "$OUTPUT" ]; then
   OUTPUT="results.xml"
 fi
 
-if [ "$MODE" = "base" ]; then
-  pytest tests/test_geometry.py --junitxml="$OUTPUT"
-else
-  pytest tests/test_hexdump.py --junitxml="$OUTPUT"
-fi
+pytest tests --junitxml="$OUTPUT"
