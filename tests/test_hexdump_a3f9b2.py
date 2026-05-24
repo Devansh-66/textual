@@ -1,7 +1,7 @@
 import pytest
 from textual.app import App
-from textual.widgets import HexDump
 from textual.geometry import Size
+
 
 
 def test_hexdump_import_exists():
@@ -11,6 +11,7 @@ def test_hexdump_import_exists():
 
 @pytest.mark.asyncio
 async def test_hexdump_defaults_and_formatting():
+    from textual.widgets import HexDump # Local import prevents collection crash
     data = b"A" * 15 + b"\x01" + b"BC" + b"\xff"
     app = App()
 
@@ -38,6 +39,7 @@ async def test_hexdump_defaults_and_formatting():
 
 @pytest.mark.asyncio
 async def test_hexdump_constructor_kwargs():
+    from textual.widgets import HexDump # Local import
     data = b"test"
 
     class ConstApp(App):
@@ -67,6 +69,7 @@ async def test_hexdump_constructor_kwargs():
 
 @pytest.mark.asyncio
 async def test_hexdump_highlighting_behavior():
+    from textual.widgets import HexDump # Local import
     data = b"ABC"
     app = App()
 
@@ -89,6 +92,7 @@ async def test_hexdump_highlighting_behavior():
 
 @pytest.mark.asyncio
 async def test_hexdump_runtime_mutability():
+    from textual.widgets import HexDump # Local import
     data = b"mutations"
     app = App()
 
@@ -110,6 +114,7 @@ async def test_hexdump_runtime_mutability():
 
 @pytest.mark.asyncio
 async def test_hexdump_dimensions():
+    from textual.widgets import HexDump # Local import
     data = b"X" * 20
     widget = HexDump(data)
 
